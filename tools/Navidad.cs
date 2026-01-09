@@ -75,20 +75,36 @@ public static class NavidadTools
         }
     }
 
-    [Description("Obtener datos curiosos navideños desde un archivo JSON para responder preguntas")]
-    public static async Task<string> GetChristmasFactAsync()
+    public static async Task<ChristmasFactData[]> ReadChristmasFactAsync()
     {
-        try
-        {
             var jsonPath = Path.Combine("assets", "datos.json");
             var jsonContent = await File.ReadAllTextAsync(jsonPath);
             var facts = JsonSerializer.Deserialize<ChristmasFactData[]>(jsonContent, options);
             
             if (facts != null && facts.Length > 0)
+                return facts;
+            else
+                return [];
+    }
+
+    [Description("Obtener datos curiosos navideños desde un archivo JSON para responder preguntas")]
+    public static async Task<string> GetChristmasFactAsync(
+        [Description("Termino clave")] string keywords
+    )
+    {
+        try
+        {
+            var facts = await ReadChristmasFactAsync();
+
+            if (facts != null && facts.Length > 0)
             {
-                var random = new Random();
-                var randomFact = facts[random.Next(facts.Length)];
-                return $"Dato navideño: {randomFact.Fact}";
+                //var random = new Random();
+                //var randomFact = facts[random.Next(facts.Length)];
+                //return $"Dato navideño: {randomFact.Fact}";
+                var factFound = facts.FirstOrDefault(x => x.Fact.Contains(keywords));
+                //Console.WriteLine(factFound.Fact);
+                //return $"Dato navideño: {factFound}";
+                return $"Dato navideño: {factFound}";
             }
             
             return "Dato navideño: ¿Sabías que la tradición del árbol de Navidad comenzó en Alemania en el siglo XVI?";
