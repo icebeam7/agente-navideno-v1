@@ -10,6 +10,8 @@ var endpoint = new Uri("https://taller-foundry.openai.azure.com/");
 var credential = new AzureCliCredential();
 var chatClient = new AzureOpenAIClient(endpoint, credential).GetChatClient("gpt-4.1");
 
+var message = "Hello world";
+
 var agent = chatClient.CreateAIAgent(
     name: "Agente Navideño",
     instructions: """
@@ -54,7 +56,7 @@ Console.WriteLine("Escribe 'exit' para salir.\n");
 
 while (true)
 {
-    Console.Write("Tú: ");
+    Console.Write("Tú: " + message);
     var userInput = Console.ReadLine();
     
     if (string.IsNullOrWhiteSpace(userInput) || userInput.ToLower() == "exit")
