@@ -6,6 +6,9 @@ using Microsoft.Extensions.AI;
 
 using AgenteApp.Tools;
 
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
 var endpoint = new Uri("https://taller-foundry.openai.azure.com/");
 var credential = new AzureCliCredential();
 var chatClient = new AzureOpenAIClient(endpoint, credential).GetChatClient("gpt-4.1");
@@ -46,42 +49,23 @@ var agent = chatClient.CreateAIAgent(
     ]
 );
 
-var conversation = agent.GetNewThread();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-Console.WriteLine("¡Bienvenido a Ayudante Navideño!");
-Console.WriteLine("Puedo ayudarte con regalos, el clima, recetas y responder preguntas.");
-Console.WriteLine("Escribe 'exit' para salir.\n");
-
-while (true)
+app.MapPost("/api/chat", async (ChatRequest request) =>
 {
-    Console.Write("Tú: ");
-    var userInput = Console.ReadLine();
-    
-    if (string.IsNullOrWhiteSpace(userInput) || userInput.ToLower() == "exit")
-    {
-        Console.WriteLine("¡Felices fiestas! ¡Que tengas una maravillosa Navidad!");
-        break;
-    }
-
     try
     {
-        Console.WriteLine("\nAgente: Procesando...\n");
-        
-        var response = await agent.RunAsync(userInput, conversation);
-        Console.WriteLine($"Agente: {response.Text}\n");
+        var conversation = agent.GetNewThread();
+        var response = await agent.RunAsync(request.Message, conversation);
+        return Results.Ok(new { reply = response.Text });
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error: {ex.Message}\n");
+        return Results.Problem(ex.Message);
     }
-}
+});
 
-// Ejemplos para mostrar las capacidades (comentados para no ejecutarse automáticamente)
-/*
-Console.WriteLine("\nEjemplos de lo que puedes preguntar:");
-Console.WriteLine("- 'Necesito un regalo de $50 para alguien en Lima'");
-Console.WriteLine("- '¿Cómo está el clima en Madrid?'");
-Console.WriteLine("- '¿Cuándo y dónde surgió la Navidad?'");
-Console.WriteLine("- 'Sugiere una receta navideña'");
-Console.WriteLine("- 'Quiero un regalo de $120 considerando el clima en Londres'");
-*/
+app.Run();
+
+record ChatRequest(string Message);

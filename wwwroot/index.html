@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente Navideño 🎄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -20px;
+            animation: fall linear infinite;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes fall {
+            0%   { top: -20px; transform: translateX(0) rotate(0deg); opacity: 1; }
+            100% { top: 100vh; transform: translateX(80px) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            animation: fadeInDown 0.9s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            color: #f7d794;
+            text-shadow: 0 0 20px rgba(247, 215, 148, 0.5);
+            margin-bottom: 10px;
+        }
+
+        header p.subtitle {
+            font-size: 1.2em;
+            color: #a8d8a8;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1.1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-card h2 {
+            color: #f7d794;
+            font-size: 1.5em;
+            margin-bottom: 12px;
+        }
+
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .capability-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .capability-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .capability-item .icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .capability-item p {
+            font-size: 0.88em;
+            color: #c8e6c9;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            animation: fadeIn 1.3s ease-out;
+        }
+
+        .chat-header {
+            background: rgba(197, 87, 87, 0.3);
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-header h3 {
+            color: #f7d794;
+            font-size: 1.05em;
+        }
+
+        .chat-messages {
+            height: 360px;
+            overflow-y: auto;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 78%;
+            padding: 11px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 0.95em;
+            animation: messageIn 0.25s ease-out;
+            white-space: pre-wrap;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .message.agent {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: rgba(197, 87, 87, 0.25);
+            border: 1px solid rgba(197, 87, 87, 0.3);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.thinking {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            align-self: flex-start;
+            font-style: italic;
+        }
+
+        .chat-input-area {
+            padding: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 11px 20px;
+            color: white;
+            font-size: 0.95em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-area input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .chat-input-area input:focus {
+            border-color: rgba(247, 215, 148, 0.5);
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #c55757, #a83232);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: transform 0.2s, opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🎄 Agente Navideño 🎅</h1>
+            <p class="subtitle">¡Bienvenido! Estoy aquí para hacer tu Navidad más especial.</p>
+        </header>
+
+        <div class="welcome-card">
+            <h2>¿En qué puedo ayudarte hoy?</h2>
+            <p>Soy tu asistente navideño inteligente. Puedo ayudarte con todo lo relacionado a la Navidad:</p>
+            <div class="capabilities">
+                <div class="capability-item">
+                    <div class="icon">🎁</div>
+                    <p>Sugerencias de regalos según tu presupuesto y el clima</p>
+                </div>
+                <div class="capability-item">
+                    <div class="icon">🌤️</div>
+                    <p>Información meteorológica de cualquier ciudad</p>
+                </div>
+                <div class="capability-item">
+                    <div class="icon">⭐</div>
+                    <p>Datos curiosos y tradiciones navideñas</p>
+                </div>
+                <div class="capability-item">
+                    <div class="icon">🍪</div>
+                    <p>Recetas navideñas deliciosas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3>🎄 Chat con el Agente Navideño</h3>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message agent">
+                    ¡Hola! 🎅 Soy el Agente Navideño. ¿Cómo puedo ayudarte hoy con tus preparativos navideños?
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input
+                    type="text"
+                    id="userInput"
+                    placeholder="Escribe tu mensaje... (ej: Necesito un regalo de $50)"
+                    autocomplete="off"
+                />
+                <button class="btn-send" id="sendBtn" onclick="sendMessage()" title="Enviar">➤</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>🎄 ¡Que tengas una maravillosa Navidad! 🎄</p>
+        </footer>
+    </div>
+
+    <script>
+        // Animated snowflakes
+        const snowflakeChars = ['❄', '❅', '❆', '✦'];
+        for (let i = 0; i < 18; i++) {
+            const el = document.createElement('div');
+            el.className = 'snowflake';
+            el.textContent = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+            el.style.left = `${Math.random() * 100}%`;
+            el.style.animationDuration = `${4 + Math.random() * 7}s`;
+            el.style.animationDelay = `${Math.random() * 6}s`;
+            el.style.fontSize = `${0.8 + Math.random() * 1.4}em`;
+            document.body.appendChild(el);
+        }
+
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatMessages = document.getElementById('chatMessages');
+
+        userInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            userInput.value = '';
+            sendBtn.disabled = true;
+            userInput.disabled = true;
+
+            addMessage(message, 'user');
+            const thinkingMsg = addMessage('Procesando... 🎄', 'thinking');
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                thinkingMsg.remove();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.reply, 'agent');
+                } else {
+                    addMessage('Lo siento, ocurrió un error. Por favor intenta de nuevo. 🎄', 'agent');
+                }
+            } catch {
+                thinkingMsg.remove();
+                addMessage('No se pudo conectar con el servidor. Por favor intenta de nuevo. 🎄', 'agent');
+            }
+
+            sendBtn.disabled = false;
+            userInput.disabled = false;
+            userInput.focus();
+        }
+    </script>
+</body>
+</html>
